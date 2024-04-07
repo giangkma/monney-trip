@@ -1,6 +1,6 @@
 import { Button, Checkbox } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { ModalAddAmount } from './ModalAddAmount'
 import { ModalAddMember } from './ModalAddMember'
@@ -137,7 +137,7 @@ export const Home = () => {
                 })
               }}
             />
-            <p className="text-[8px]">{formatCurrency(amountOfUser)}</p>
+            <p className="text-[10px]">{formatCurrency(amountOfUser)}</p>
           </div>
         )
       }
@@ -169,6 +169,16 @@ export const Home = () => {
     setUsers([])
     setDataAmount([])
   }
+
+  const totalUsersPaid = useMemo(() => {
+    return users.reduce((accumulator, user) => {
+      if (user.paid === true) {
+        return accumulator + 1
+      } else {
+        return accumulator
+      }
+    }, 0)
+  }, [users])
 
   return (
     <div className="sm:p-8 p-3">
@@ -212,7 +222,9 @@ export const Home = () => {
             />
           </div>
           <div className="mt-6 xl:w-1/3 mx-auto sm:w-1/2">
-            <p className="bg-gray-200 p-2 rounded-md text-center">Kết quả</p>
+            <p className="bg-gray-200 p-2 rounded-md text-center">
+              Kết quả ({totalUsersPaid} / {users.length} Đã đóng)
+            </p>
             <Table
               columns={columnsResult}
               dataSource={dataResult}
