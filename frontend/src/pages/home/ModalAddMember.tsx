@@ -1,13 +1,14 @@
 import { Button } from 'antd'
-import { PrimaryButton } from 'components/buttons/PrimaryButton'
-import { InputText } from 'components/inputs/InputText'
-import { Spinner } from 'components/loading/Spinner'
-import { PrimaryModal } from 'components/modals/PrimaryModal'
 import { IAddMember } from 'domain/index'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
+import { InputText } from 'components/inputs/InputText'
+import { ModalAddQuickMember } from './ModalAddQuickMember'
+import { PrimaryButton } from 'components/buttons/PrimaryButton'
+import { PrimaryModal } from 'components/modals/PrimaryModal'
+import { Spinner } from 'components/loading/Spinner'
 import { randomId } from 'utils'
+import { toast } from 'react-toastify'
+import { useForm } from 'react-hook-form'
+import { useState } from 'react'
 
 interface IProps {
   setUsers: React.Dispatch<React.SetStateAction<any[]>>
@@ -48,6 +49,7 @@ export const ModalAddMember = ({ setUsers, users }: IProps) => {
           ...p,
           {
             ...data,
+            paid: false,
             id: randomId()
           }
         ])
@@ -81,9 +83,15 @@ export const ModalAddMember = ({ setUsers, users }: IProps) => {
   return (
     <div>
       <Spinner loading={loading} />
-      <Button onClick={() => setIsOpen(true)} className="h-12">
-        + Thêm thành viên
-      </Button>
+      <div className="flex items-center">
+        <Button
+          onClick={() => setIsOpen(true)}
+          className="h-12 bg-green-600 text-white"
+        >
+          + Thêm thành viên ({users.length})
+        </Button>
+        <ModalAddQuickMember setUsers={setUsers} />
+      </div>
       <div className="mt-3 flex items-center gap-2 flex-wrap">
         {users?.map((user) => {
           return (
@@ -128,13 +136,13 @@ export const ModalAddMember = ({ setUsers, users }: IProps) => {
           className="flex flex-col items-end"
         >
           <InputText
-            placeholder="Họ và tên"
+            placeholder="Tên"
             name="name"
             control={control}
             error={errors?.name?.message}
             className="mb-3"
             required
-            label="Họ và tên"
+            label="Tên"
           />
           <InputText
             placeholder="Tiền đã cọc (VNĐ)"

@@ -1,4 +1,4 @@
-import { Button, Checkbox, Input } from 'antd'
+import { Button, Checkbox } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import { useEffect, useRef, useState } from 'react'
 
@@ -13,6 +13,9 @@ export const Home = () => {
   const [dataAmount, setDataAmount] = useState<any[]>(
     JSON.parse(localStorage.getItem('dataAmount') ?? '[]')
   )
+
+  const [amountEdit, setAmountEdit] = useState()
+
   const certificatePrint = useRef<HTMLDivElement>(null)
 
   const listUserId = users.map((user) => user.id)
@@ -21,23 +24,40 @@ export const Home = () => {
     {
       title: 'Mục chi',
       dataIndex: 'name',
+      align: 'center',
       fixed: 'left',
-      width: 100,
+      width: 90,
       render: (name: string, record) => {
         const nameUserPay = users.find((user) => user.id === record.userPay)
           ?.name
         return (
-          <div>
+          <div onClick={() => setAmountEdit(record)}>
             <p className="text-sm">{name}</p>
             <p className="text-[11px]">({nameUserPay})</p>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4 mx-auto"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+              />
+            </svg>
           </div>
         )
       }
     },
     {
       title: 'Số tiền',
+      fixed: 'left',
+      align: 'center',
       dataIndex: 'amount',
-      width: 120,
+      width: 100,
       render: (amount: number) => {
         return (
           <p className="text-sm whitespace-nowrap">{formatCurrency(amount)}</p>
@@ -63,6 +83,22 @@ export const Home = () => {
       render: (needToPay: number) => {
         return <p>{formatCurrency(needToPay)}</p>
       }
+    },
+    {
+      dataIndex: 'paid',
+      render: (paid, user) => {
+        return (
+          <Checkbox
+            checked={paid}
+            onChange={(e) => {
+              const index = users.findIndex((i) => i.id === user.id)
+              const newUsers = [...users]
+              newUsers[index].paid = e.target.checked
+              setUsers(newUsers)
+            }}
+          />
+        )
+      }
     }
   ]
 
@@ -76,13 +112,14 @@ export const Home = () => {
 
   users.forEach((user, index) => {
     columnsAmount.push({
-      title: <p className="whitespace-nowrap">{user.name}</p>,
+      title: <p className="text-center">{user.name}</p>,
       dataIndex: 'users',
+      width: 70,
       render: (_users: string[], record) => {
         const isUserExist = _users.includes(user.id)
         const amountOfUser = isUserExist ? record.amount / _users.length : 0
         return (
-          <div className="flex items-start flex-col gap-2">
+          <div className="flex items-center flex-col gap-2">
             <Checkbox
               checked={isUserExist}
               onChange={(e) => {
@@ -100,7 +137,7 @@ export const Home = () => {
                 })
               }}
             />
-            <p className="text-xs">{formatCurrency(amountOfUser)}</p>
+            <p className="text-[8px]">{formatCurrency(amountOfUser)}</p>
           </div>
         )
       }
@@ -121,7 +158,8 @@ export const Home = () => {
       id: user.id,
       name: user.name,
       deposit: user.deposit,
-      needToPay
+      needToPay,
+      paid: user.paid
     }
   })
 
@@ -134,19 +172,14 @@ export const Home = () => {
 
   return (
     <div className="sm:p-8 p-3">
-      <div className="flex items-start justify-between">
+      <div className="flex">
         <ModalAddMember setUsers={setUsers} users={users} />
-        {users.length > 0 && (
-          <Button className="h-12" onClick={clearData}>
-            Xoá dữ liệu
-          </Button>
-        )}
       </div>
       {users.length > 0 && (
         <div ref={certificatePrint}>
           <div className="my-5">
             <Table
-              scroll={{ x: 800 }}
+              scroll={{ x: 1200 }}
               columns={columnsAmount}
               dataSource={dataAmount}
               pagination={false}
@@ -167,6 +200,15 @@ export const Home = () => {
                   }
                 ])
               }}
+              onEditAmount={(data) => {
+                const { id } = data
+                const index = dataAmount.findIndex((i) => i.id === id)
+                const newData = [...dataAmount]
+                newData[index] = data
+                setDataAmount(newData)
+              }}
+              dataEdit={amountEdit}
+              onClose={() => setAmountEdit(undefined)}
             />
           </div>
           <div className="mt-6 xl:w-1/3 mx-auto sm:w-1/2">
@@ -179,6 +221,14 @@ export const Home = () => {
             />
           </div>
         </div>
+      )}
+      {users.length > 0 && (
+        <Button
+          className="h-12 w-full bg-red-500 text-white text-xl"
+          onClick={clearData}
+        >
+          Xoá dữ liệu
+        </Button>
       )}
     </div>
   )

@@ -19,7 +19,7 @@ export const PrimaryModal = ({
   return (
     <div className="fixed top-0 left-1/2 transform -translate-x-1/2 shadow-xl bg-black bg-opacity-80 w-full h-full flex items-start justify-center z-50">
       <div
-        className={`mx-4 sm:min-w-[30rem] max-h-[calc(100%-5rem)] overflow-auto rounded-lg mt-40 bg-white dark:bg-slate-800 sm:p-6 p-4 ${className}`}
+        className={`mx-4 sm:min-w-[30rem] min-w-[calc(100%-5rem)] max-h-[calc(100%-5rem)] overflow-auto rounded-lg mt-40 bg-white dark:bg-slate-800 sm:p-6 p-4 ${className}`}
       >
         <div className="flex items-center justify-between">
           <h1 className="font-semibold text-xl">{title}</h1>

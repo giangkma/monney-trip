@@ -1,21 +1,31 @@
 import { Button, Select } from 'antd'
-import { PrimaryButton } from 'components/buttons/PrimaryButton'
+import { useEffect, useState } from 'react'
+
+import { IAddAmount } from 'domain/index'
 import { InputSelect } from 'components/inputs/InputSelect'
 import { InputText } from 'components/inputs/InputText'
-import { Spinner } from 'components/loading/Spinner'
+import { PrimaryButton } from 'components/buttons/PrimaryButton'
 import { PrimaryModal } from 'components/modals/PrimaryModal'
-import { IAddAmount } from 'domain/index'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
+import { Spinner } from 'components/loading/Spinner'
 import { randomId } from 'utils'
+import { toast } from 'react-toastify'
+import { useForm } from 'react-hook-form'
 
 interface IProps {
   onAddAmount: (data: IAddAmount) => void
   users: any[]
+  dataEdit: any
+  onClose: () => void
+  onEditAmount: (data: any) => void
 }
 
-export const ModalAddAmount = ({ onAddAmount, users }: IProps) => {
+export const ModalAddAmount = ({
+  onAddAmount,
+  onClose,
+  dataEdit,
+  users,
+  onEditAmount
+}: IProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const {
     control,
@@ -29,10 +39,14 @@ export const ModalAddAmount = ({ onAddAmount, users }: IProps) => {
   const onSubmit = async (data: IAddAmount) => {
     try {
       setLoading(true)
-      onAddAmount({
-        ...data,
-        id: randomId()
-      })
+      if (dataEdit) {
+        onEditAmount(data)
+      } else {
+        onAddAmount({
+          ...data,
+          id: randomId()
+        })
+      }
       setIsOpen(false)
       reset()
     } catch (error: any) {
@@ -47,6 +61,13 @@ export const ModalAddAmount = ({ onAddAmount, users }: IProps) => {
     value: user.id
   }))
 
+  useEffect(() => {
+    if (!!dataEdit) {
+      setIsOpen(true)
+      reset(dataEdit)
+    }
+  }, [dataEdit])
+
   return (
     <>
       <Spinner loading={loading} />
@@ -54,11 +75,12 @@ export const ModalAddAmount = ({ onAddAmount, users }: IProps) => {
         + Thêm mục chi
       </Button>
       <PrimaryModal
-        title="Thêm mục chi"
+        title={dataEdit ? 'Sửa mục chi' : 'Thêm mục chi'}
         open={isOpen}
         onClose={() => {
           setIsOpen(false)
           reset()
+          onClose()
         }}
       >
         <form
@@ -92,7 +114,7 @@ export const ModalAddAmount = ({ onAddAmount, users }: IProps) => {
             className="mb-3"
             options={usersOptions}
           />
-          <PrimaryButton type="submit" text="Thêm" />
+          <PrimaryButton type="submit" text={dataEdit ? 'Lưu' : 'Thêm'} />
         </form>
       </PrimaryModal>
     </>

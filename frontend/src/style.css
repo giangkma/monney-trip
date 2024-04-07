@@ -30,3 +30,7 @@ input::-webkit-inner-spin-button {
 input[type='number'] {
   -moz-appearance: textfield;
 }
+
+.ant-table-cell {
+  padding: 1rem 0.2rem !important;
+}
