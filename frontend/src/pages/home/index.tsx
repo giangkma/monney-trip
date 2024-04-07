@@ -58,9 +58,21 @@ export const Home = () => {
       align: 'center',
       dataIndex: 'amount',
       width: 100,
-      render: (amount: number) => {
+      render: (amount: number, { users }) => {
         return (
-          <p className="text-sm whitespace-nowrap">{formatCurrency(amount)}</p>
+          <div className="flex flex-col gap-1">
+            <p className="text-sm text-red-600 whitespace-nowrap">
+              {formatCurrency(amount)}
+            </p>
+            <hr className="" />
+            <p className="text-[10px] whitespace-nowrap">
+              {users.length} người
+            </p>
+            <hr className="" />
+            <p className="text-[10px] whitespace-nowrap">
+              {formatCurrency(amount / users.length)} / người
+            </p>
+          </div>
         )
       }
     }
